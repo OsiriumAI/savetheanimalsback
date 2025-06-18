@@ -15,8 +15,58 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 
 // Ticket schema
 const ticketSchema = new mongoose.Schema({
-  animal: String,
-  description: String,
+  // Animal Details
+  species: { type: String, required: true },
+  nickname: String,
+  physicalDescription: String,
+  approximateAge: String,
+
+  // Original Location
+  originalLocation: String,
+  community: String,
+  dateLastSeen: Date,
+
+  // Removal Details
+  dateOfRelocation: Date,
+  takenBy: String,
+  organizationOrIndividual: String,
+  affiliation: String,
+  witnesses: [String],
+  removalDescription: String,
+
+  // Current Location
+  currentFacility: String,
+  facilityWebsite: String,
+  facilityAddress: String,
+  facilityContact: String,
+  facilityPhone: String,
+  facilityEmail: String,
+  facilitySocial: String,
+  rescueOrProtect: { type: String, enum: ['yes', 'no', 'unknown'], default: 'unknown' },
+
+  // Evidence & Proof
+  photoUrls: [String],
+  videoUrls: [String],
+  socialLinks: [String],
+  newsLinks: [String],
+
+  // Personal Statement
+  fullStory: String,
+  whyUnjust: String,
+
+  // Permission or Legal Documentation
+  hasDocumentation: { type: String, enum: ['yes', 'no'], default: 'no' },
+  documentationUrls: [String],
+  documentationDescription: String,
+
+  // Your Info
+  submitterName: String,
+  submitterEmail: String,
+  affirmed: { type: Boolean, default: false },
+
+  // Existing fields
+  animal: String, // for backward compatibility
+  description: String, // for backward compatibility
   lawsViolated: [String],
   status: { type: String, default: 'pending' },
   upvotes: { type: Number, default: 0 },
@@ -29,8 +79,7 @@ const Ticket = mongoose.model('Ticket', ticketSchema);
 
 // Submit ticket
 app.post('/api/tickets', async (req, res) => {
-  const { animal, description, lawsViolated } = req.body;
-  const ticket = new Ticket({ animal, description, lawsViolated });
+  const ticket = new Ticket({ ...req.body });
   await ticket.save();
   res.status(201).json(ticket);
 });
